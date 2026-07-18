@@ -45,13 +45,21 @@ export function AetherPortal() {
       {/* Inner disc */}
       <div className="absolute inset-10 rounded-full bg-gradient-to-br from-[oklch(0.2_0.05_275)] via-[oklch(0.16_0.05_290)] to-[oklch(0.14_0.03_260)] shadow-[inset_0_0_80px_oklch(0.55_0.24_275/40%)]" />
 
-      {/* Aether portrait */}
-      <div className="absolute inset-0 flex items-end justify-center overflow-hidden">
+      {/* Aether portrait — head anchored near portal center, body fades into portal */}
+      <div className="absolute inset-0 overflow-hidden rounded-full">
+        {/* Halo behind head */}
+        <div
+          aria-hidden
+          className="absolute left-1/2 top-[26%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, oklch(0.75 0.22 260 / 55%), transparent 70%)" }}
+        />
         <div
           className="absolute inset-0"
           style={{
-            mask: "radial-gradient(circle at 50% 55%, black 55%, transparent 72%)",
-            WebkitMask: "radial-gradient(circle at 50% 55%, black 55%, transparent 72%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 62% 70% at 50% 45%, black 55%, transparent 88%)",
+            maskImage:
+              "radial-gradient(ellipse 62% 70% at 50% 45%, black 55%, transparent 88%)",
           }}
         >
           <motion.img
@@ -59,16 +67,17 @@ export function AetherPortal() {
             alt="Aether — your AI interview mentor"
             width={1024}
             height={1536}
-            className="absolute left-1/2 bottom-[-6%] w-[86%] -translate-x-1/2 mix-blend-screen"
+            className="absolute left-1/2 top-[4%] w-[74%] -translate-x-1/2 mix-blend-screen"
             style={{
               filter:
-                "drop-shadow(0 0 40px oklch(0.65 0.24 260 / 60%)) contrast(1.05) saturate(1.1)",
+                "drop-shadow(0 8px 30px oklch(0.65 0.24 260 / 70%)) contrast(1.08) saturate(1.12) brightness(1.05)",
             }}
-            animate={{ y: [0, -8, 0] }}
+            animate={{ y: [0, -6, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
         </div>
       </div>
+
 
       {/* Ground reflection */}
       <div className="pointer-events-none absolute inset-x-10 bottom-8 h-6 rounded-[50%] bg-[radial-gradient(ellipse,oklch(0.7_0.22_270/50%),transparent_70%)] blur-md" />
