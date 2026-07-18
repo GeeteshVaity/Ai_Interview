@@ -57,15 +57,16 @@ export function HowItWorks() {
   );
 }
 
-function TimelineStep({
-  step,
-  index,
-}: {
-  step: (typeof import("./HowItWorks"))["steps"] extends infer _ ? any : any;
-  index: number;
-}) {
+type Step = {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  desc: string;
+};
+
+function TimelineStep({ step, index }: { step: Step; index: number }) {
   const { icon: Icon, title, desc } = step;
   const left = index % 2 === 0;
+
   return (
     <motion.li
       initial={{ opacity: 0, y: 40 }}
