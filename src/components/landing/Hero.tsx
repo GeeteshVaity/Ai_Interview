@@ -1,10 +1,20 @@
-import { motion } from "motion/react";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { useRef } from "react";
 import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { AetherPortal } from "./AetherPortal";
 
 export function Hero() {
   return (
     <section className="relative flex min-h-[100svh] items-center justify-center px-4 pt-28 pb-16">
+      {/* Radial section glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-0"
+        style={{
+          background:
+            "radial-gradient(60% 55% at 65% 45%, oklch(0.6 0.24 285 / 22%), transparent 70%)",
+        }}
+      />
       <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
         {/* Text */}
         <motion.div
@@ -77,26 +87,73 @@ export function Hero() {
   );
 }
 
-function MagneticButton({
+export function MagneticButton({
   children,
   primary,
+  href = "#",
 }: {
   children: React.ReactNode;
   primary?: boolean;
+  href?: string;
 }) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 220, damping: 18, mass: 0.4 });
+  const sy = useSpring(my, { stiffness: 220, damping: 18, mass: 0.4 });
+  const gx = useTransform(sx, (v) => `${50 + v * 1.2}%`);
+  const gy = useTransform(sy, (v) => `${50 + v * 1.2}%`);
+
+  const onMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = ((e.clientX - r.left) / r.width - 0.5) * 24;
+    const py = ((e.clientY - r.top) / r.height - 0.5) * 20;
+    mx.set(px);
+    my.set(py);
+  };
+  const onLeave = () => {
+    mx.set(0);
+    my.set(0);
+  };
+
   return (
-    <motion.button
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    <motion.a
+      ref={ref}
+      href={href}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ x: sx, y: sy }}
+      whileTap={{ scale: 0.96 }}
       className={
         primary
-          ? "group relative overflow-hidden rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-medium text-primary-foreground shadow-[0_10px_40px_-10px_oklch(0.65_0.26_300/70%)]"
-          : "glass group relative overflow-hidden rounded-full px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
+          ? "group relative inline-flex items-center overflow-hidden rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-medium text-primary-foreground animate-breathe-glow"
+          : "glass group relative inline-flex items-center overflow-hidden rounded-full px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
       }
     >
-      {children}
-      <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-    </motion.button>
+      {/* radial hover light */}
+      <motion.span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(120px circle at ${gx.get()} ${gy.get()}, oklch(1 0 0 / 22%), transparent 60%)`,
+        }}
+      />
+      <span className="relative z-10">{children}</span>
+      {/* shine sweep */}
+      <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+      {/* animated border for secondary */}
+      {!primary && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            boxShadow:
+              "inset 0 0 0 1px oklch(0.75 0.2 265 / 55%), 0 0 24px oklch(0.7 0.22 275 / 35%)",
+          }}
+        />
+      )}
+    </motion.a>
   );
 }
