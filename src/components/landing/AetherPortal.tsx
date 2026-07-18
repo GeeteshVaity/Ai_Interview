@@ -96,19 +96,22 @@ function FloatingCard({
   label,
   pos,
   delay,
+  hideOnMobile,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   pos: string;
   delay: number;
+  hideOnMobile?: boolean;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 + delay, duration: 0.7, ease: "easeOut" }}
-      className={`absolute ${pos} z-10`}
+      className={`absolute ${pos} z-10 ${hideOnMobile ? "hidden sm:block" : ""}`}
     >
+
       <motion.div
         animate={{ y: [0, -6, 0] }}
         transition={{ duration: 4 + delay * 2, repeat: Infinity, ease: "easeInOut", delay }}
