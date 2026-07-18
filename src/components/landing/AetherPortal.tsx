@@ -10,13 +10,14 @@ import {
 } from "lucide-react";
 
 const cards = [
-  { icon: FileText, label: "Resume Analysis", pos: "top-[8%] -left-4 md:-left-10" },
-  { icon: MessageSquare, label: "AI Interview", pos: "top-[6%] -right-2 md:-right-8" },
-  { icon: Mic, label: "Voice AI", pos: "top-1/2 -left-8 md:-left-16 -translate-y-1/2" },
-  { icon: Brain, label: "LLM Intelligence", pos: "top-1/2 -right-6 md:-right-14 -translate-y-1/2" },
-  { icon: BarChart3, label: "Performance Analytics", pos: "bottom-[10%] -left-2 md:-left-6" },
-  { icon: Sparkles, label: "Personalized Feedback", pos: "bottom-[8%] -right-2 md:-right-6" },
+  { icon: FileText, label: "Resume Analysis", pos: "top-[6%] left-0 sm:-left-6 md:-left-12" },
+  { icon: MessageSquare, label: "AI Interview", pos: "top-[4%] right-0 sm:-right-4 md:-right-10" },
+  { icon: Mic, label: "Voice AI", pos: "top-1/2 -left-2 sm:-left-8 md:-left-16 -translate-y-1/2", hideOnMobile: false },
+  { icon: Brain, label: "LLM Intelligence", pos: "top-1/2 -right-2 sm:-right-8 md:-right-14 -translate-y-1/2" },
+  { icon: BarChart3, label: "Analytics", pos: "bottom-[8%] left-2 sm:-left-4 md:-left-8", hideOnMobile: true },
+  { icon: Sparkles, label: "Personalized Feedback", pos: "bottom-[6%] right-2 sm:-right-4 md:-right-8", hideOnMobile: true },
 ];
+
 
 export function AetherPortal() {
   return (
