@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { useRef } from "react";
 import {
   FileText,
   Mic,
@@ -44,7 +45,16 @@ const features = [
 export function Features() {
   return (
     <section id="features" className="relative px-4 py-32">
-      <div className="mx-auto max-w-6xl">
+      {/* Radial section glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-0"
+        style={{
+          background:
+            "radial-gradient(50% 40% at 50% 20%, oklch(0.6 0.24 285 / 18%), transparent 70%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           eyebrow="Features"
           title="Everything you need to interview like a pro"
@@ -72,38 +82,77 @@ function FeatureCard({
   desc: string;
   index: number;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(50);
+  const my = useMotionValue(0);
+  const smx = useSpring(mx, { stiffness: 180, damping: 20 });
+  const smy = useSpring(my, { stiffness: 180, damping: 20 });
+  const bg = useTransform(
+    [smx, smy] as unknown as [typeof smx, typeof smy],
+    ([x, y]) =>
+      `radial-gradient(420px circle at ${x}% ${y}%, oklch(0.7 0.22 275 / 22%), transparent 60%)`,
+  );
+
+  // subtle tilt
+  const rx = useTransform(smy, [0, 100], [4, -4]);
+  const ry = useTransform(smx, [0, 100], [-4, 4]);
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    mx.set(((e.clientX - r.left) / r.width) * 100);
+    my.set(((e.clientY - r.top) / r.height) * 100);
+  };
+
+  const evenAnim = index % 2 === 0
+    ? { opacity: 0, y: 24 }
+    : { opacity: 0, y: 24, x: index % 3 === 1 ? -8 : 8 };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={() => {
+        mx.set(50);
+        my.set(0);
+      }}
+      initial={evenAnim}
+      whileInView={{ opacity: 1, y: 0, x: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: index * 0.05, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-2xl"
+      transition={{ duration: 0.7, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+      style={{ rotateX: rx, rotateY: ry, transformPerspective: 900 }}
+      className="group relative overflow-hidden rounded-2xl transition-transform duration-500 will-change-transform hover:-translate-y-1"
     >
-      {/* Animated border */}
-      <div
+      {/* Animated conic border */}
+      <motion.div
         aria-hidden
-        className="absolute inset-0 rounded-2xl opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+        className="absolute inset-0 rounded-2xl opacity-50 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "conic-gradient(from 0deg, transparent 0deg, oklch(0.7 0.22 270 / 60%) 90deg, transparent 180deg, oklch(0.65 0.26 305 / 60%) 270deg, transparent 360deg)",
+            "conic-gradient(from 0deg, transparent 0deg, oklch(0.7 0.22 270 / 70%) 90deg, transparent 180deg, oklch(0.65 0.26 305 / 70%) 270deg, transparent 360deg)",
         }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
       />
       <div className="glass-strong relative m-px rounded-[calc(1rem-1px)] p-6 h-full">
-        <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[0_8px_30px_-8px_oklch(0.65_0.26_300/60%)]">
+        <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[0_8px_30px_-8px_oklch(0.65_0.26_300/60%)] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-6deg]">
           <Icon className="h-5 w-5" />
         </div>
         <h3 className="mb-2 text-lg font-semibold tracking-tight">{title}</h3>
         <p className="text-sm leading-relaxed text-muted-foreground">{desc}</p>
 
-        {/* Hover glow */}
-        <div
+        {/* Mouse-tracking radial glow */}
+        <motion.div
           aria-hidden
           className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{
-            background:
-              "radial-gradient(400px circle at var(--x,50%) var(--y,0%), oklch(0.7 0.22 275 / 15%), transparent 60%)",
-          }}
+          style={{ background: bg }}
+        />
+
+        {/* Glass shine sweep */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -translate-x-full rounded-[calc(1rem-1px)] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 group-hover:translate-x-full"
         />
       </div>
     </motion.div>
@@ -135,7 +184,7 @@ export function SectionHeader({
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.05 }}
+        transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
         className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-5xl"
       >
         {title}
@@ -145,7 +194,7 @@ export function SectionHeader({
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
           className="mt-4 text-base text-muted-foreground sm:text-lg"
         >
           {sub}

@@ -22,24 +22,47 @@ export function Navbar() {
       initial={{ y: -30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4"
+      className={`fixed top-0 left-0 right-0 z-50 flex justify-center px-4 transition-all duration-500 ${
+        scrolled ? "pt-2" : "pt-4"
+      }`}
     >
       <nav
-        className={`glass flex w-full max-w-6xl items-center justify-between rounded-full px-4 py-2.5 transition-all duration-500 ${
-          scrolled ? "shadow-[0_10px_40px_-10px_oklch(0.55_0.24_275/40%)]" : ""
+        className={`glass relative flex items-center justify-between rounded-full transition-all duration-500 ${
+          scrolled
+            ? "w-full max-w-5xl px-3 py-2 shadow-[0_10px_40px_-10px_oklch(0.55_0.24_275/50%)]"
+            : "w-full max-w-6xl px-4 py-2.5"
         }`}
+        style={
+          scrolled
+            ? {
+                boxShadow:
+                  "0 10px 40px -10px oklch(0.55 0.24 275 / 50%), inset 0 1px 0 oklch(1 0 0 / 8%)",
+              }
+            : { boxShadow: "inset 0 1px 0 oklch(1 0 0 / 6%)" }
+        }
       >
-        <a href="#" className="flex items-center gap-2 pl-2">
+        {/* border glow */}
+        <span
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 rounded-full transition-opacity duration-500 ${
+            scrolled ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            boxShadow:
+              "0 0 0 1px oklch(0.7 0.22 275 / 25%), 0 0 30px oklch(0.65 0.26 300 / 25%)",
+          }}
+        />
+        <a href="#" className="relative flex items-center gap-2 pl-2">
           <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground">
             <Sparkles className="h-4 w-4" strokeWidth={2.5} />
-            <span className="absolute inset-0 rounded-lg blur-md opacity-70 bg-[image:var(--gradient-primary)] -z-10" />
+            <span className="absolute inset-0 -z-10 rounded-lg bg-[image:var(--gradient-primary)] opacity-70 blur-md" />
           </span>
           <span className="font-display text-[15px] font-semibold tracking-tight">
             Interview<span className="text-gradient">AI</span>
           </span>
         </a>
 
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="relative hidden items-center gap-1 md:flex">
           {links.map((l) => (
             <li key={l.label}>
               <a
@@ -52,7 +75,7 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
           <a
             href="#"
             className="hidden rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
