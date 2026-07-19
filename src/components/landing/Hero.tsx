@@ -47,13 +47,13 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <MagneticButton primary>
+            <MagneticButton primary href="/upload">
               <span className="flex items-center gap-2">
                 Start Journey
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </MagneticButton>
-            <MagneticButton>
+            <MagneticButton href="#how">
               <span className="flex items-center gap-2">
                 <Play className="h-3.5 w-3.5 fill-current" />
                 Watch Demo
