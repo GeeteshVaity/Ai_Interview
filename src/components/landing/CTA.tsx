@@ -57,7 +57,7 @@ export function CTA() {
           Join thousands of candidates practicing with Aether every day.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <MagneticButton primary href="#">
+          <MagneticButton primary href="/upload">
             <span className="flex items-center gap-2">
               Start Free Journey
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
