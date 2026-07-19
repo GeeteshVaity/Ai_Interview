@@ -256,7 +256,7 @@ function ListCard({
   accent,
   className = "",
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   title: string;
   items: string[];
   accent: string;
