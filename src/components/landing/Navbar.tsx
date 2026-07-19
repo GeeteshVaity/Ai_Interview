@@ -1,11 +1,13 @@
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const links = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Features", href: "/#features" },
+  { label: "How It Works", href: "/#how" },
+  { label: "Interview", href: "/interview" },
+  { label: "Results", href: "/results" },
 ];
 
 export function Navbar() {
@@ -52,7 +54,7 @@ export function Navbar() {
               "0 0 0 1px oklch(0.7 0.22 275 / 25%), 0 0 30px oklch(0.65 0.26 300 / 25%)",
           }}
         />
-        <a href="#" className="relative flex items-center gap-2 pl-2">
+        <Link to="/" className="relative flex items-center gap-2 pl-2">
           <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground">
             <Sparkles className="h-4 w-4" strokeWidth={2.5} />
             <span className="absolute inset-0 -z-10 rounded-lg bg-[image:var(--gradient-primary)] opacity-70 blur-md" />
@@ -60,7 +62,7 @@ export function Navbar() {
           <span className="font-display text-[15px] font-semibold tracking-tight">
             Interview<span className="text-gradient">AI</span>
           </span>
-        </a>
+        </Link>
 
         <ul className="relative hidden items-center gap-1 md:flex">
           {links.map((l) => (
@@ -82,13 +84,13 @@ export function Navbar() {
           >
             Login
           </a>
-          <a
-            href="#cta"
+          <Link
+            to="/upload"
             className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full bg-[image:var(--gradient-primary)] px-4 py-2 text-sm font-medium text-primary-foreground shadow-[0_8px_30px_-8px_oklch(0.65_0.26_300/70%)] transition-transform hover:scale-[1.03]"
           >
             <span className="relative z-10">Get Started</span>
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-          </a>
+          </Link>
         </div>
       </nav>
     </motion.header>
