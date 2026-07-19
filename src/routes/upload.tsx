@@ -14,7 +14,7 @@ export const Route = createFileRoute("/upload")({
   }),
 });
 
-type Stage = "idle" | "uploading" | "done";
+type Stage = "idle" | "uploading" | "analyzing" | "done";
 
 function UploadPage() {
   const navigate = useNavigate();
@@ -33,7 +33,8 @@ function UploadPage() {
     return null;
   };
 
-  const beginUpload = useCallback((f: File) => {
+  const beginUpload = useCallback(async (f: File) => {
+    console.log("Upload started for file:", f.name);
     const err = validate(f);
     if (err) {
       setError(err);
@@ -42,16 +43,55 @@ function UploadPage() {
     setError(null);
     setFile(f);
     setStage("uploading");
-    setProgress(0);
-    const start = Date.now();
-    const tick = () => {
-      const elapsed = Date.now() - start;
-      const p = Math.min(100, (elapsed / 1800) * 100);
-      setProgress(p);
-      if (p < 100) requestAnimationFrame(tick);
-      else setStage("done");
-    };
-    requestAnimationFrame(tick);
+    setProgress(20);
+
+    const formData = new FormData();
+    formData.append("file", f);
+
+    try {
+      // ── Step 1: Upload PDF → extract text ──
+      const uploadRes = await fetch("http://localhost:8000/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        const detail = await uploadRes.json().catch(() => null);
+        throw new Error(detail?.detail || "Upload failed");
+      }
+
+      const uploadData = await uploadRes.json();
+      // uploadData = { filename, pages, text }
+      console.log(`✅ Extracted text from ${uploadData.pages} page(s):`, uploadData.text.substring(0, 200));
+      setProgress(50);
+
+      // ── Step 2: Send text to AI for parsing ──
+      setStage("analyzing");
+      const analyzeRes = await fetch("http://localhost:8000/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: uploadData.text }),
+      });
+
+      if (!analyzeRes.ok) {
+        const detail = await analyzeRes.json().catch(() => null);
+        throw new Error(detail?.detail || "Analysis failed");
+      }
+
+      const parsedResume = await analyzeRes.json();
+      // parsedResume = { skills: [...], projects: [...], education: [...], experience: [...] }
+      console.log("✅ AI parsed resume:", parsedResume);
+
+      // ── Step 3: Save to sessionStorage and mark done ──
+      sessionStorage.setItem("parsedResume", JSON.stringify(parsedResume));
+
+      setProgress(100);
+      setStage("done");
+    } catch (uploadErr: unknown) {
+      const message = uploadErr instanceof Error ? uploadErr.message : "Something went wrong";
+      setError(`${message}. Is the backend running on port 8000?`);
+      setStage("idle");
+    }
   }, []);
 
   const onDrop = (e: React.DragEvent) => {
@@ -115,11 +155,10 @@ function UploadPage() {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
                 onClick={() => inputRef.current?.click()}
-                className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 text-center transition-all ${
-                  dragOver
-                    ? "border-[var(--neon-cyan)] bg-white/[0.04]"
-                    : "border-white/15 hover:border-white/30"
-                }`}
+                className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 text-center transition-all ${dragOver
+                  ? "border-[var(--neon-cyan)] bg-white/[0.04]"
+                  : "border-white/15 hover:border-white/30"
+                  }`}
               >
                 <motion.div
                   animate={{ y: [0, -6, 0] }}
@@ -194,7 +233,9 @@ function UploadPage() {
                     <p className="mt-2 text-xs text-muted-foreground">
                       {stage === "uploading"
                         ? `Uploading… ${Math.round(progress)}%`
-                        : "Upload complete — ready to analyze."}
+                        : stage === "analyzing"
+                          ? `Analyzing with AI… ${Math.round(progress)}%`
+                          : "✅ Analysis complete — ready for interview!"}
                     </p>
                   </div>
                 </div>
@@ -220,7 +261,7 @@ function UploadPage() {
               )}
               <motion.button
                 disabled={stage !== "done"}
-                onClick={() => navigate({ to: "/analyzing" })}
+                onClick={() => navigate({ to: "/interview" })}
                 whileTap={{ scale: 0.97 }}
                 className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[image:var(--gradient-primary)] px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-[0_8px_30px_-8px_oklch(0.65_0.26_300/70%)] transition-opacity disabled:opacity-40"
               >

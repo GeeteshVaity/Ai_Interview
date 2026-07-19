@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import {
   Award,
@@ -9,6 +10,9 @@ import {
   RotateCw,
   Home,
   CheckCircle2,
+  Loader2,
+  Mic,
+  Brain,
 } from "lucide-react";
 import { PageShell } from "@/components/shared/PageShell";
 
@@ -22,26 +26,144 @@ export const Route = createFileRoute("/results")({
   }),
 });
 
-const strengths = [
-  "Clear STAR-style structure with concrete outcomes",
-  "Strong ownership language and quantified impact",
-  "Confident, well-paced delivery",
-];
-
-const weaknesses = [
-  "Answers occasionally drift into technical detail before framing the goal",
-  "Limited reflection on trade-offs and alternative approaches",
-  "Could tie stories back to the target role more explicitly",
-];
-
-const improvements = [
-  "Open every answer with a one-sentence headline before the story",
-  "Practice trimming answers to 90–120 seconds for behavioral prompts",
-  "Prepare two crisp examples of cross-functional collaboration",
-];
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+interface ResultsData {
+  overall_score: number;
+  clarity_score: number;
+  structure_score: number;
+  confidence_score: number;
+  strengths: string[];
+  weaknesses: string[];
+  improvements: string[];
+  summary: string;
+  score_label: string;
+}
 
 function ResultsPage() {
-  const score = 82;
+  const navigate = useNavigate();
+  const [results, setResults] = useState<ResultsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // ── On mount: call /finish to get AI evaluation ──
+  useEffect(() => {
+    const fetchResults = async () => {
+      // Read transcript saved by interview page
+      const transcriptStr = sessionStorage.getItem("interviewTranscript");
+      const resumeSummary = sessionStorage.getItem("resumeSummary") || "";
+
+      if (!transcriptStr) {
+        // No transcript — try to show results anyway or redirect
+        setError("No interview data found. Please complete an interview first.");
+        setLoading(false);
+        return;
+      }
+
+      const transcript = JSON.parse(transcriptStr);
+      console.log("📊 Generating results for", transcript.length, "transcript entries");
+
+      try {
+        const res = await fetch("http://localhost:8000/finish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transcript, resume_summary: resumeSummary }),
+        });
+
+        if (!res.ok) {
+          const detail = await res.json().catch(() => null);
+          throw new Error(detail?.detail || "Failed to generate results");
+        }
+
+        const data: ResultsData = await res.json();
+        console.log("✅ Results received:", data);
+        setResults(data);
+      } catch (err) {
+        console.error("❌ Error generating results:", err);
+        setError("Failed to generate your results. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
+  }, []);
+
+  // ── Loading state ──
+  if (loading) {
+    return (
+      <PageShell>
+        <section className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center px-4 py-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center gap-6 text-center"
+          >
+            <div className="relative">
+              <motion.div
+                aria-hidden
+                className="absolute inset-0 rounded-full blur-2xl"
+                style={{ background: "var(--gradient-portal)" }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              />
+              <div className="glass-strong relative flex h-24 w-24 items-center justify-center rounded-full">
+                <Loader2 className="h-10 w-10 animate-spin text-[var(--neon-cyan)]" />
+              </div>
+            </div>
+            <h2 className="font-display text-2xl font-semibold">Nova is analyzing your interview…</h2>
+            <p className="text-sm text-muted-foreground">Evaluating your answers, structure, and delivery</p>
+            <div className="mt-4 flex items-center gap-3">
+              {["Scoring clarity", "Evaluating structure", "Generating feedback"].map((step, i) => (
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0.3 }}
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.6 }}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--neon-cyan)]" />
+                  {step}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+      </PageShell>
+    );
+  }
+
+  // ── Error state ──
+  if (error || !results) {
+    return (
+      <PageShell>
+        <section className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center px-4 py-20">
+          <div className="glass-strong rounded-3xl p-8 text-center">
+            <AlertCircle className="mx-auto h-10 w-10 text-destructive" />
+            <h2 className="mt-4 font-display text-xl font-semibold">{error || "Something went wrong"}</h2>
+            <div className="mt-6 flex justify-center gap-3">
+              <Link
+                to="/interview"
+                className="group inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-medium text-primary-foreground"
+              >
+                <RotateCw className="h-4 w-4" /> Try Again
+              </Link>
+              <Link
+                to="/"
+                className="glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium hover:bg-white/[0.06]"
+              >
+                <Home className="h-4 w-4" /> Home
+              </Link>
+            </div>
+          </div>
+        </section>
+      </PageShell>
+    );
+  }
+
+  // ── Results display ──
+  const { overall_score, clarity_score, structure_score, confidence_score, strengths, weaknesses, improvements, summary, score_label } = results;
 
   return (
     <PageShell>
@@ -77,14 +199,29 @@ function ResultsPage() {
           </p>
         </motion.div>
 
-        {/* Score + summary */}
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          <ScoreCard score={score} />
-          <StatCard icon={TrendingUp} label="Clarity" value="88" tone="cyan" />
-          <StatCard icon={MessageSquare} label="Structure" value="79" tone="purple" />
+        {/* Score + sub-scores */}
+        <div className="mt-10 grid gap-5 md:grid-cols-4">
+          <ScoreCard score={overall_score} label={score_label} />
+          <StatCard icon={TrendingUp} label="Clarity" value={String(clarity_score)} tone="cyan" />
+          <StatCard icon={MessageSquare} label="Structure" value={String(structure_score)} tone="purple" />
+          <StatCard icon={Mic} label="Confidence" value={String(confidence_score)} tone="cyan" />
         </div>
 
-        {/* Feedback grid */}
+        {/* AI Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="glass-strong mt-6 rounded-3xl p-6"
+        >
+          <div className="mb-3 flex items-center gap-2">
+            <Brain className="h-4 w-4 text-[var(--neon-cyan)]" />
+            <h3 className="font-display text-lg font-semibold">AI Summary</h3>
+          </div>
+          <p className="text-sm leading-relaxed text-muted-foreground">{summary}</p>
+        </motion.div>
+
+        {/* Strengths & Weaknesses grid */}
         <div className="mt-6 grid gap-5 md:grid-cols-2">
           <ListCard
             icon={Award}
@@ -94,31 +231,13 @@ function ResultsPage() {
           />
           <ListCard
             icon={AlertCircle}
-            title="Areas to improve"
+            title="Areas to Improve"
             items={weaknesses}
             accent="oklch(0.72 0.24 30)"
           />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass-strong mt-6 rounded-3xl p-6"
-        >
-          <div className="mb-3 flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-[var(--neon-cyan)]" />
-            <h3 className="font-display text-lg font-semibold">AI Feedback</h3>
-          </div>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            You demonstrated strong ownership and quantified impact throughout the session.
-            Your best moment was the project story about scaling reliability — the outcome
-            was concrete and the metric memorable. Watch for meandering openings on
-            behavioral prompts; anchor each answer with a one-line headline before diving
-            into detail. Overall a poised, senior-level performance.
-          </p>
-        </motion.div>
-
+        {/* Improvements */}
         <ListCard
           icon={Lightbulb}
           title="Suggested Improvements"
@@ -128,14 +247,20 @@ function ResultsPage() {
         />
 
         {/* Actions */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/interview"
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3 pb-8">
+          <button
+            onClick={() => {
+              // Clear session data for a fresh start
+              sessionStorage.removeItem("interviewTranscript");
+              sessionStorage.removeItem("parsedResume");
+              sessionStorage.removeItem("resumeSummary");
+              navigate({ to: "/upload" });
+            }}
             className="group inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient-primary)] px-6 py-3 text-sm font-medium text-primary-foreground shadow-[0_8px_30px_-8px_oklch(0.65_0.26_300/70%)] transition-transform hover:scale-[1.03]"
           >
             <RotateCw className="h-4 w-4" />
-            Retry Interview
-          </Link>
+            New Interview
+          </button>
           <Link
             to="/"
             className="glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium hover:bg-white/[0.06]"
@@ -149,7 +274,11 @@ function ResultsPage() {
   );
 }
 
-function ScoreCard({ score }: { score: number }) {
+// ──────────────────────────────────────────────
+// Sub-components
+// ──────────────────────────────────────────────
+
+function ScoreCard({ score, label }: { score: number; label: string }) {
   const R = 46;
   const C = 2 * Math.PI * R;
   return (
@@ -189,19 +318,22 @@ function ScoreCard({ score }: { score: number }) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="font-display text-3xl font-semibold">{score}</div>
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            / 100
-          </div>
+          <motion.div
+            className="font-display text-3xl font-semibold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {score}
+          </motion.div>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">/ 100</div>
         </div>
       </div>
       <div>
-        <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-          Overall Score
-        </div>
-        <div className="mt-1 font-display text-xl font-semibold">Strong</div>
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Overall Score</div>
+        <div className="mt-1 font-display text-xl font-semibold">{label}</div>
         <div className="mt-1 text-xs text-muted-foreground">
-          Above the 78th percentile of candidates.
+          Based on your complete interview session.
         </div>
       </div>
     </motion.div>
@@ -240,10 +372,15 @@ function StatCard({
         <Icon className="h-5 w-5" />
       </div>
       <div>
-        <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-          {label}
-        </div>
-        <div className="mt-0.5 font-display text-2xl font-semibold">{value}</div>
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground">{label}</div>
+        <motion.div
+          className="mt-0.5 font-display text-2xl font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          {value}
+        </motion.div>
       </div>
     </motion.div>
   );
@@ -275,13 +412,20 @@ function ListCard({
       </div>
       <ul className="space-y-2.5">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+          <motion.li
+            key={i}
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className="flex items-start gap-3 text-sm text-muted-foreground"
+          >
             <span
               className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
               style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
             />
             <span>{item}</span>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </motion.div>
