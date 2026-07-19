@@ -1,11 +1,13 @@
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const links = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Features", href: "/#features" },
+  { label: "How It Works", href: "/#how" },
+  { label: "Interview", href: "/interview" },
+  { label: "Results", href: "/results" },
 ];
 
 export function Navbar() {
