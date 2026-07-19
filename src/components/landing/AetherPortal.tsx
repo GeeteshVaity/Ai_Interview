@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import aether from "@/assets/aether.png";
+import { RobotMascot } from "@/components/robot/RobotMascot";
 import {
   FileText,
   MessageSquare,
@@ -22,21 +22,9 @@ export function AetherPortal() {
   return (
     <motion.div
       className="relative mx-auto aspect-square w-full max-w-[560px]"
-      animate={{ scale: [1, 1.015, 1] }}
+      animate={{ scale: [1, 1.01, 1] }}
       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
     >
-      {/* Outer breathing aura */}
-      <motion.div
-        aria-hidden
-        className="absolute -inset-6 rounded-full blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, oklch(0.7 0.22 275 / 35%), transparent 65%)",
-        }}
-        animate={{ opacity: [0.5, 0.9, 0.5], scale: [1, 1.05, 1] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       {/* Portal glow layers */}
       <div
         aria-hidden
@@ -50,30 +38,20 @@ export function AetherPortal() {
           background: "var(--gradient-portal)",
           filter: "blur(2px)",
           mask: "radial-gradient(circle, transparent 58%, black 60%, transparent 68%)",
+          WebkitMask:
+            "radial-gradient(circle, transparent 58%, black 60%, transparent 68%)",
         }}
         animate={{ rotate: 360 }}
         transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
       />
-
-      {/* Holographic rotating rings */}
-      <motion.div
-        aria-hidden
-        className="absolute inset-4 rounded-full border border-white/15"
-        style={{ mask: "radial-gradient(circle, transparent 61%, black 62%, transparent 66%)" }}
-        animate={{ rotate: -360 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        aria-hidden
-        className="absolute inset-6 rounded-full border border-white/10"
-        style={{ mask: "radial-gradient(circle, transparent 62%, black 63%, transparent 71%)" }}
-        animate={{ rotate: -360 }}
-        transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
-      />
       <motion.div
         aria-hidden
         className="absolute inset-2 rounded-full border border-dashed border-[var(--neon-cyan)]/25"
-        style={{ mask: "radial-gradient(circle, transparent 66%, black 67%, transparent 70%)" }}
+        style={{
+          mask: "radial-gradient(circle, transparent 66%, black 67%, transparent 70%)",
+          WebkitMask:
+            "radial-gradient(circle, transparent 66%, black 67%, transparent 70%)",
+        }}
         animate={{ rotate: 360 }}
         transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       />
@@ -96,9 +74,6 @@ export function AetherPortal() {
         ))}
       </div>
 
-      {/* Inner disc */}
-      <div className="absolute inset-10 rounded-full bg-gradient-to-br from-[oklch(0.2_0.05_275)] via-[oklch(0.16_0.05_290)] to-[oklch(0.14_0.03_260)] shadow-[inset_0_0_80px_oklch(0.55_0.24_275/40%)]" />
-
       {/* Energy waves - expanding rings */}
       {[0, 1, 2].map((i) => (
         <motion.div
@@ -111,91 +86,10 @@ export function AetherPortal() {
         />
       ))}
 
-      {/* Aether portrait — breathing + floating */}
-      <div className="absolute inset-0 overflow-hidden rounded-full">
-        <div
-          aria-hidden
-          className="absolute left-1/2 top-[26%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-          style={{ background: "radial-gradient(circle, oklch(0.75 0.22 260 / 55%), transparent 70%)" }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            WebkitMaskImage:
-              "radial-gradient(ellipse 62% 70% at 50% 45%, black 55%, transparent 88%)",
-            maskImage:
-              "radial-gradient(ellipse 62% 70% at 50% 45%, black 55%, transparent 88%)",
-          }}
-        >
-          <motion.img
-            src={aether}
-            alt="Aether — your AI interview mentor"
-            width={1024}
-            height={1536}
-            className="absolute left-1/2 top-[4%] w-[74%] -translate-x-1/2 mix-blend-screen"
-            style={{
-              filter:
-                "drop-shadow(0 8px 30px oklch(0.65 0.24 260 / 70%)) contrast(1.08) saturate(1.12) brightness(1.05)",
-            }}
-            animate={{ y: [0, -8, 0], scale: [1, 1.012, 1] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-
-        {/* Glowing eyes overlay - subtle pulsing cyan glow at eye height */}
-        <motion.div
-          aria-hidden
-          className="absolute left-1/2 top-[26%] -translate-x-1/2"
-          animate={{ opacity: [0.35, 0.85, 0.35] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <div className="flex gap-[26px]">
-            <span
-              className="block h-2 w-2 rounded-full"
-              style={{
-                background: "oklch(0.95 0.15 210)",
-                boxShadow:
-                  "0 0 12px 3px oklch(0.85 0.2 220 / 90%), 0 0 24px 6px oklch(0.75 0.22 260 / 60%)",
-              }}
-            />
-            <span
-              className="block h-2 w-2 rounded-full"
-              style={{
-                background: "oklch(0.95 0.15 210)",
-                boxShadow:
-                  "0 0 12px 3px oklch(0.85 0.2 220 / 90%), 0 0 24px 6px oklch(0.75 0.22 260 / 60%)",
-              }}
-            />
-          </div>
-        </motion.div>
+      {/* Robot mascot */}
+      <div className="absolute inset-0">
+        <RobotMascot size={560} showRing={false} showParticles={false} className="mx-auto" />
       </div>
-
-      {/* Orbiting particles */}
-      {Array.from({ length: 10 }).map((_, i) => {
-        const angle = (i / 10) * 360;
-        const dur = 14 + (i % 4) * 3;
-        return (
-          <motion.div
-            key={i}
-            aria-hidden
-            className="absolute left-1/2 top-1/2 h-1 w-1"
-            style={{ transformOrigin: "0 0" }}
-            animate={{ rotate: [angle, angle + 360] }}
-            transition={{ duration: dur, repeat: Infinity, ease: "linear" }}
-          >
-            <span
-              className="absolute block h-1 w-1 rounded-full bg-white"
-              style={{
-                transform: `translate(${180 + (i % 3) * 12}px, 0)`,
-                boxShadow: "0 0 8px 2px oklch(0.85 0.16 250 / 80%)",
-              }}
-            />
-          </motion.div>
-        );
-      })}
-
-      {/* Ground reflection */}
-      <div className="pointer-events-none absolute inset-x-10 bottom-8 h-6 rounded-[50%] bg-[radial-gradient(ellipse,oklch(0.7_0.22_270/50%),transparent_70%)] blur-md" />
 
       {/* Floating cards */}
       {cards.map((c, i) => (
@@ -232,16 +126,15 @@ function FloatingCard({
         <motion.div
           whileHover={{ y: -4, rotate: 2, scale: 1.04 }}
           transition={{ type: "spring", stiffness: 260, damping: 18 }}
-          className="glass-strong group flex cursor-default items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-medium tracking-tight text-foreground/90 shadow-[0_8px_30px_-10px_oklch(0.55_0.24_275/60%)] transition-shadow duration-500 hover:shadow-[0_18px_50px_-10px_oklch(0.65_0.26_300/70%)]"
+          className="glass-strong group relative flex cursor-default items-center gap-2 overflow-hidden rounded-xl px-3 py-2 text-[11px] font-medium tracking-tight text-foreground/90 shadow-[0_8px_30px_-10px_oklch(0.55_0.24_275/60%)] transition-shadow duration-500 hover:shadow-[0_18px_50px_-10px_oklch(0.65_0.26_300/70%)]"
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[image:var(--gradient-primary)] text-primary-foreground transition-transform duration-500 group-hover:rotate-[-6deg]">
             <Icon className="h-3.5 w-3.5" />
           </span>
           <span className="whitespace-nowrap">{label}</span>
-          {/* glass shine */}
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-0 -translate-x-full rounded-xl bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full"
+            className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full"
           />
         </motion.div>
       </motion.div>
