@@ -9,25 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UploadRouteImport } from './routes/upload'
-import { Route as ResultsRouteImport } from './routes/results'
-import { Route as InterviewRouteImport } from './routes/interview'
-import { Route as AnalyzingRouteImport } from './routes/analyzing'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyzingRouteImport } from './routes/analyzing'
+import { Route as InterviewRouteImport } from './routes/interview'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResultsRouteImport } from './routes/results'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as UploadRouteImport } from './routes/upload'
 
-const UploadRoute = UploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResultsRoute = ResultsRouteImport.update({
-  id: '/results',
-  path: '/results',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InterviewRoute = InterviewRouteImport.update({
-  id: '/interview',
-  path: '/interview',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyzingRoute = AnalyzingRouteImport.update({
@@ -35,9 +27,29 @@ const AnalyzingRoute = AnalyzingRouteImport.update({
   path: '/analyzing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const InterviewRoute = InterviewRouteImport.update({
+  id: '/interview',
+  path: '/interview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -45,14 +57,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analyzing': typeof AnalyzingRoute
   '/interview': typeof InterviewRoute
+  '/login': typeof LoginRoute
   '/results': typeof ResultsRoute
+  '/signup': typeof SignupRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analyzing': typeof AnalyzingRoute
   '/interview': typeof InterviewRoute
+  '/login': typeof LoginRoute
   '/results': typeof ResultsRoute
+  '/signup': typeof SignupRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesById {
@@ -60,46 +76,58 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analyzing': typeof AnalyzingRoute
   '/interview': typeof InterviewRoute
+  '/login': typeof LoginRoute
   '/results': typeof ResultsRoute
+  '/signup': typeof SignupRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analyzing' | '/interview' | '/results' | '/upload'
+  fullPaths:
+    | '/'
+    | '/analyzing'
+    | '/interview'
+    | '/login'
+    | '/results'
+    | '/signup'
+    | '/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analyzing' | '/interview' | '/results' | '/upload'
-  id: '__root__' | '/' | '/analyzing' | '/interview' | '/results' | '/upload'
+  to:
+    | '/'
+    | '/analyzing'
+    | '/interview'
+    | '/login'
+    | '/results'
+    | '/signup'
+    | '/upload'
+  id:
+    | '__root__'
+    | '/'
+    | '/analyzing'
+    | '/interview'
+    | '/login'
+    | '/results'
+    | '/signup'
+    | '/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyzingRoute: typeof AnalyzingRoute
   InterviewRoute: typeof InterviewRoute
+  LoginRoute: typeof LoginRoute
   ResultsRoute: typeof ResultsRoute
+  SignupRoute: typeof SignupRoute
   UploadRoute: typeof UploadRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/upload': {
-      id: '/upload'
-      path: '/upload'
-      fullPath: '/upload'
-      preLoaderRoute: typeof UploadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/results': {
-      id: '/results'
-      path: '/results'
-      fullPath: '/results'
-      preLoaderRoute: typeof ResultsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/interview': {
-      id: '/interview'
-      path: '/interview'
-      fullPath: '/interview'
-      preLoaderRoute: typeof InterviewRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analyzing': {
@@ -109,11 +137,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyzingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/interview': {
+      id: '/interview'
+      path: '/interview'
+      fullPath: '/interview'
+      preLoaderRoute: typeof InterviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -123,7 +179,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyzingRoute: AnalyzingRoute,
   InterviewRoute: InterviewRoute,
+  LoginRoute: LoginRoute,
   ResultsRoute: ResultsRoute,
+  SignupRoute: SignupRoute,
   UploadRoute: UploadRoute,
 }
 export const routeTree = rootRouteImport
