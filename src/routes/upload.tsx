@@ -16,6 +16,8 @@ export const Route = createFileRoute("/upload")({
 
 type Stage = "idle" | "uploading" | "analyzing" | "done";
 
+const API_URL = import.meta.env.PROD ? "/api" : "http://localhost:8000";
+
 function UploadPage() {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +52,7 @@ function UploadPage() {
 
     try {
       // ── Step 1: Upload PDF → extract text ──
-      const uploadRes = await fetch("http://localhost:8000/upload", {
+      const uploadRes = await fetch(`${API_URL}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -67,7 +69,7 @@ function UploadPage() {
 
       // ── Step 2: Send text to AI for parsing ──
       setStage("analyzing");
-      const analyzeRes = await fetch("http://localhost:8000/analyze", {
+      const analyzeRes = await fetch(`${API_URL}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: uploadData.text }),
