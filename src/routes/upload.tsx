@@ -89,7 +89,11 @@ function UploadPage() {
       setStage("done");
     } catch (uploadErr: unknown) {
       const message = uploadErr instanceof Error ? uploadErr.message : "Something went wrong";
-      setError(`${message}. Please check your deployment backend configuration.`);
+      setError(
+        import.meta.env.PROD
+          ? `${message}. Please check your Vercel logs and API configuration.`
+          : `${message}. Is the backend running on port 8000?`
+      );
       setStage("idle");
     }
   }, []);
