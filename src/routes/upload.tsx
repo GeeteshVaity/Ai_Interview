@@ -63,7 +63,6 @@ function UploadPage() {
       }
 
       const uploadData = await uploadRes.json();
-      // uploadData = { filename, pages, text }
       console.log(`✅ Extracted text from ${uploadData.pages} page(s):`, uploadData.text.substring(0, 200));
       setProgress(50);
 
@@ -81,7 +80,6 @@ function UploadPage() {
       }
 
       const parsedResume = await analyzeRes.json();
-      // parsedResume = { skills: [...], projects: [...], education: [...], experience: [...] }
       console.log("✅ AI parsed resume:", parsedResume);
 
       // ── Step 3: Save to sessionStorage and mark done ──
@@ -161,10 +159,11 @@ function UploadPage() {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
                 onClick={() => inputRef.current?.click()}
-                className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 text-center transition-all ${dragOver
-                  ? "border-[var(--neon-cyan)] bg-white/[0.04]"
-                  : "border-white/15 hover:border-white/30"
-                  }`}
+                className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 text-center transition-all ${
+                  dragOver
+                    ? "border-[var(--neon-cyan)] bg-white/[0.04]"
+                    : "border-white/15 hover:border-white/30"
+                }`}
               >
                 <motion.div
                   animate={{ y: [0, -6, 0] }}
@@ -240,8 +239,8 @@ function UploadPage() {
                       {stage === "uploading"
                         ? `Uploading… ${Math.round(progress)}%`
                         : stage === "analyzing"
-                          ? `Analyzing with AI… ${Math.round(progress)}%`
-                          : "✅ Analysis complete — ready for interview!"}
+                        ? `Analyzing with AI… ${Math.round(progress)}%`
+                        : "✅ Analysis complete — ready for interview!"}
                     </p>
                   </div>
                 </div>
