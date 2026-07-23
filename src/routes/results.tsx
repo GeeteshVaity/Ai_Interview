@@ -41,6 +41,8 @@ interface ResultsData {
   score_label: string;
 }
 
+const API_URL = import.meta.env.PROD ? "/api" : "http://localhost:8000";
+
 function ResultsPage() {
   const navigate = useNavigate();
   const [results, setResults] = useState<ResultsData | null>(null);
@@ -65,7 +67,7 @@ function ResultsPage() {
       console.log("📊 Generating results for", transcript.length, "transcript entries");
 
       try {
-        const res = await fetch("http://localhost:8000/finish", {
+        const res = await fetch(`${API_URL}/finish`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ transcript, resume_summary: resumeSummary }),

@@ -93,6 +93,8 @@ function speakText(text: string, onEnd?: () => void): SpeechSynthesisUtterance |
 }
 
 
+const API_URL = import.meta.env.PROD ? "/api" : "http://localhost:8000";
+
 function InterviewPage() {
   const navigate = useNavigate();
 
@@ -246,7 +248,7 @@ function InterviewPage() {
       console.log("📋 Resume data loaded:", parsedResume);
 
       try {
-        const res = await fetch("http://localhost:8000/start-interview", {
+        const res = await fetch(`${API_URL}/start-interview`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(parsedResume),
@@ -309,7 +311,7 @@ function InterviewPage() {
 
     try {
       // ── Call /answer for evaluation ──
-      const res = await fetch("http://localhost:8000/answer", {
+      const res = await fetch(`${API_URL}/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -416,8 +418,8 @@ function InterviewPage() {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ${lastVerdict === "satisfied"
-          ? "bg-emerald-500/20 text-emerald-400"
-          : "bg-amber-500/20 text-amber-400"
+        ? "bg-emerald-500/20 text-emerald-400"
+        : "bg-amber-500/20 text-amber-400"
         }`}
     >
       {lastVerdict === "satisfied" ? (
@@ -527,8 +529,8 @@ function InterviewPage() {
                 <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground">
                   <Circle
                     className={`h-2 w-2 ${lastVerdict === "follow_up"
-                        ? "fill-amber-400 text-amber-400"
-                        : "fill-[var(--neon-cyan)] text-[var(--neon-cyan)]"
+                      ? "fill-amber-400 text-amber-400"
+                      : "fill-[var(--neon-cyan)] text-[var(--neon-cyan)]"
                       }`}
                   />
                   {lastVerdict === "follow_up" ? "Nova wants to know more" : "Nova asks"}
@@ -558,8 +560,8 @@ function InterviewPage() {
                 whileTap={{ scale: 0.94 }}
                 disabled={loading || submitting}
                 className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-40 ${recording
-                    ? "bg-destructive text-destructive-foreground"
-                    : "bg-[image:var(--gradient-primary)] text-primary-foreground"
+                  ? "bg-destructive text-destructive-foreground"
+                  : "bg-[image:var(--gradient-primary)] text-primary-foreground"
                   }`}
                 aria-label={recording ? "Stop recording" : "Start recording"}
               >
@@ -633,12 +635,12 @@ function InterviewPage() {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`rounded-2xl px-3 py-2 text-xs leading-relaxed ${t.who === "AI"
-                      ? t.type === "follow_up"
-                        ? "border border-amber-500/30 bg-amber-500/10 text-foreground/90"
-                        : t.type === "feedback"
-                          ? "bg-emerald-500/10 text-foreground/90"
-                          : "bg-white/[0.04] text-foreground/90"
-                      : "ml-6 bg-[image:var(--gradient-primary)] text-primary-foreground"
+                    ? t.type === "follow_up"
+                      ? "border border-amber-500/30 bg-amber-500/10 text-foreground/90"
+                      : t.type === "feedback"
+                        ? "bg-emerald-500/10 text-foreground/90"
+                        : "bg-white/[0.04] text-foreground/90"
+                    : "ml-6 bg-[image:var(--gradient-primary)] text-primary-foreground"
                     }`}
                 >
                   <div className="mb-0.5 text-[10px] uppercase tracking-wider opacity-70">
