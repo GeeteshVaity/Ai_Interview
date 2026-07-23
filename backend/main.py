@@ -11,7 +11,8 @@ from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import fitz  # PyMuPDF — reads PDF files
+import io
+from pypdf import PdfReader
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -81,13 +82,15 @@ async def upload_resume(file: UploadFile = File(...)):
     # Read and extract text
     content = await file.read()
     try:
-        doc = fitz.open(stream=content, filetype="pdf")
+        reader = PdfReader(io.BytesIO(content))
         resume_text = ""
-        for page in doc:
-            resume_text += page.get_text()
-        num_pages = len(doc)
-        doc.close()
-    except Exception:
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                resume_text += text + "\n"
+        num_pages = len(reader.pages)
+    except Exception as e:
+        print("PDF parse error:", e)
         raise HTTPException(status_code=400, detail="Could not read the PDF file.")
 
     if not resume_text.strip():
